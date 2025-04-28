@@ -49,8 +49,7 @@ export const applicationsController = {
     }
 
     return h.view('applications/views/show', {
-      pageTitle: 'Case Detail',
-      heading: selectedCase.businessName || 'Case Detail',
+      pageTitle: 'Application',
       caseData: selectedCase
     })
   }
