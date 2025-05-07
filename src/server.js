@@ -9,6 +9,7 @@ import { config } from './common/config.js'
 import { logger } from './common/logger.js'
 import { health } from './health/index.js'
 import { nunjucksConfig } from './config/nunjucks/nunjucks.js'
+import { auth } from './common/auth.js'
 
 export const createServer = async () => {
   const server = hapi.server({
@@ -63,7 +64,8 @@ export const createServer = async () => {
     },
     Inert,
     Vision,
-    nunjucksConfig
+    nunjucksConfig,
+    auth.plugin
   ])
 
   await server.register([health, cases])
