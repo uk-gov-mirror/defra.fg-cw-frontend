@@ -1,8 +1,6 @@
 import Bell from "@hapi/bell";
-import hapi from "@hapi/hapi";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { auth } from "../../common/auth.js";
-import { nunjucks } from "../../common/nunjucks/nunjucks.js";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import { createServer } from "../../server.js";
 import { loginCallbackRoute } from "./login-callback.route.js";
 
 const createToken = (data) => {
@@ -27,13 +25,14 @@ const createToken = (data) => {
   return `${header}.${payload}.${signature}`;
 };
 
+vi.mock("../use-cases/create-or-update-user.use-case.js");
+
 describe("loginCallbackRoute", () => {
   let server;
 
   beforeAll(async () => {
     Bell.simulate(async () => ({}));
-    server = hapi.server();
-    await server.register([nunjucks, auth.plugin]);
+    server = await createServer();
     server.route(loginCallbackRoute);
     await server.initialize();
   });
@@ -43,7 +42,7 @@ describe("loginCallbackRoute", () => {
     Bell.simulate(false);
   });
 
-  it("redirects to destination when logged in", async () => {
+  test("redirects to destination when logged in", async () => {
     const { statusCode, headers } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -66,7 +65,7 @@ describe("loginCallbackRoute", () => {
     expect(headers.location).toEqual("/cases");
   });
 
-  it("redirects to / when no next query param is provided", async () => {
+  test("redirects to / when no next query param is provided", async () => {
     const { statusCode, headers } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -86,7 +85,7 @@ describe("loginCallbackRoute", () => {
     expect(headers.location).toEqual("/");
   });
 
-  it("throws Boom.unauthorized when ID token cannot be decoded", async () => {
+  test("throws Boom.unauthorized when ID token cannot be decoded", async () => {
     const { result, statusCode } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -101,15 +100,12 @@ describe("loginCallbackRoute", () => {
       },
     });
     expect(statusCode).toEqual(400);
-    expect(result).toEqual({
-      statusCode: 400,
-      error: "Bad Request",
-      message:
-        "User's ID token cannot be decoded: Invalid token specified: invalid base64 for part #2 (base64 string is not of the correct length)",
-    });
+    expect(result).toContain(
+      "User&#39;s ID token cannot be decoded: Invalid token specified: invalid base64 for part #2 (base64 string is not of the correct length)",
+    );
   });
 
-  it("throws Boom.badRequest when ID token is missing", async () => {
+  test("throws Boom.badRequest when ID token is missing", async () => {
     const { result, statusCode } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -123,14 +119,10 @@ describe("loginCallbackRoute", () => {
     });
 
     expect(statusCode).toEqual(400);
-    expect(result).toEqual({
-      statusCode: 400,
-      error: "Bad Request",
-      message: "User has no ID token. Cannot verify roles.",
-    });
+    expect(result).toContain("User has no ID token. Cannot verify roles.");
   });
 
-  it("throws Boom.badRequest when roles not in ID token", async () => {
+  test("throws Boom.badRequest when roles not in ID token", async () => {
     const { result, statusCode } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -146,15 +138,12 @@ describe("loginCallbackRoute", () => {
     });
 
     expect(statusCode).toEqual(400);
-    expect(result).toEqual({
-      statusCode: 400,
-      error: "Bad Request",
-      message:
-        "User with IDP id '12345678-1234-1234-1234-123456789012' has no 'roles' claim in ID token",
-    });
+    expect(result).toContain(
+      "User with IDP id &#39;12345678-1234-1234-1234-123456789012&#39; has no &#39;roles&#39; claim in ID token",
+    );
   });
 
-  it("throws Boom.unauthorized when roles in token but no valid roles found", async () => {
+  test("throws Boom.unauthorized when roles in token but no valid roles found", async () => {
     const { result, statusCode } = await server.inject({
       method: "GET",
       url: "/login/callback",
@@ -172,11 +161,8 @@ describe("loginCallbackRoute", () => {
     });
 
     expect(statusCode).toEqual(401);
-    expect(result).toEqual({
-      statusCode: 401,
-      error: "Unauthorized",
-      message:
-        "User with IDP id '12345678-1234-1234-1234-123456789012' has not been assigned a valid role. Expected one of [FCP.Casework.Read, FCP.Casework.ReadWrite, FCP.Casework.Admin], got []",
-    });
+    expect(result).toContain(
+      "User with IDP id &#39;12345678-1234-1234-1234-123456789012&#39; has not been assigned a valid role. Expected one of [FCP.Casework.Read, FCP.Casework.ReadWrite, FCP.Casework.Admin], got []",
+    );
   });
 });

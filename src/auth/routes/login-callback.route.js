@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom";
 import { jwtDecode } from "jwt-decode";
+import { createOrUpdateUser } from "../use-cases/create-or-update-user.use-case.js";
 
 const getIdToken = (artifacts) => {
   const { id_token: idToken } = artifacts;
@@ -63,8 +64,16 @@ export const loginCallbackRoute = {
       );
     }
 
+    await createOrUpdateUser({
+      name: idToken.name,
+      email: auth.credentials.profile.email,
+      idpId: idToken.oid,
+      idpRoles: roles,
+    });
+
     request.cookieAuth.set({
       token: auth.credentials.token,
+      // refreshToken: auth.credentials.refreshToken,
       authenticated: auth.isAuthenticated,
       authorised: true,
     });

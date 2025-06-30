@@ -7,6 +7,9 @@ export default defineConfig({
     environment: "jsdom",
     env: {
       NODE_OPTIONS: "--disable-warning=ExperimentalWarning",
+      AZURE_CLIENT_ID: "test-client-id",
+      AZURE_TENANT_ID: "test-tenant-id",
+      AZURE_CLIENT_SECRET: "test-client-secret",
     },
     coverage: {
       enabled: true,
