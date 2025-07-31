@@ -2,7 +2,7 @@ services:
   localstack:
     image: localstack/localstack:3.0.2
     ports:
-      - "4567:4566"
+      - "${LOCALSTACK_PORT:-4571}:4566"
     env_file:
       - "compose/aws.env"
     environment:
@@ -21,10 +21,18 @@ services:
     networks:
       - cdp-tenant
 
-  your-frontend:
+  redis:
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - "${REDIS_PORT:-6381}:6379"
+    restart: always
+    networks:
+      - cdp-tenant
+
+  fg-cw-frontend:
     build: ./
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT:-8080}:8080"
     links:
       - "localstack:localstack"
       - "redis:redis"
@@ -36,7 +44,7 @@ services:
     env_file:
       - "compose/aws.env"
     environment:
-      PORT: 3000
+      PORT: 8080
       NODE_ENV: development
       REDIS_HOST: redis
       LOCALSTACK_ENDPOINT: http://localstack:4566
@@ -49,4 +57,5 @@ volumes:
 
 networks:
   cdp-tenant:
-    driver: bridge
+    external: true
+    name: cdp-tenant
