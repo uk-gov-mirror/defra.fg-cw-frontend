@@ -3,19 +3,24 @@
   govukServiceNavigation({
     navigation: [
       {
-        href: "/cases/" + params.caseDataId,
+        href: "/cases/" + params.caseId,
         text: "Tasks",
         active: params.active == 'tasks'
       },
       {
-        href: "/cases/" + params.caseDataId + "/case-details",
+        href: "/cases/" + params.caseId + "/case-details",
         text: "Case Details",
         active: params.active == 'caseDetails'
       },
       {
         href: "#",
-        text: "Land Details",
-        active: params.active == 'landDetails'
+        text: "Notes",
+        active: params.active == 'notes'
+      },
+      {
+        href: "/cases/" + params.caseId + "/timeline",
+        text: "Timeline",
+        active: params.active == 'timeline'
       }
     ]
   })

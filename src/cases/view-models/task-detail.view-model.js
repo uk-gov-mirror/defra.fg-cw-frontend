@@ -5,9 +5,14 @@ export const createTaskDetailViewModel = (caseData, query) => {
     (stage) => stage.id === caseData.currentStage,
   );
 
+  const { taskGroupId, taskId } = query;
+  const currentGroup = stage.taskGroups.find((g) => g.id === taskGroupId);
+  const currentGroupTasks = currentGroup.tasks;
+  const currentTask = currentGroupTasks.find((t) => t.id === taskId);
+
   return {
     pageTitle: "Case task",
-    heading: "Case",
+    pageHeading: "Case",
     breadcrumbs: [
       { text: "Cases", href: "/cases" },
       { text: caseData.caseRef, href: "/cases/" + caseData._id },
@@ -28,8 +33,13 @@ export const createTaskDetailViewModel = (caseData, query) => {
         currentStage: caseData.currentStage,
       },
       stage,
-      taskId: query.taskId,
-      taskGroupId: query.taskGroupId,
+      taskGroupId,
+      currentTask: {
+        ...currentTask,
+        link: `/cases/${caseData._id}/tasks/${taskGroupId}/${currentTask.id}`,
+        status: currentTask.status === "complete" ? "COMPLETE" : "INCOMPLETE",
+        isComplete: currentTask.status === "complete",
+      },
     },
   };
 };

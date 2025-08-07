@@ -1,8 +1,7 @@
 import hapi from "@hapi/hapi";
-import Vision from "@hapi/vision";
 import { load } from "cheerio";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { nunjucksConfig } from "../../config/nunjucks/nunjucks.js";
+import { nunjucks } from "../../common/nunjucks/nunjucks.js";
 import { findCaseByIdUseCase } from "../use-cases/find-case-by-id.use-case.js";
 import { listTasksRoute } from "./list-tasks.route.js";
 
@@ -14,7 +13,7 @@ describe("listTasksRoute", () => {
   beforeAll(async () => {
     server = hapi.server();
     server.route(listTasksRoute);
-    await server.register([Vision, nunjucksConfig]);
+    await server.register([nunjucks]);
 
     await server.initialize();
   });
@@ -30,7 +29,7 @@ describe("listTasksRoute", () => {
       workflowCode: "frps-private-beta",
       status: "NEW",
       dateReceived: "2025-06-11T10:43:01.603Z",
-      currentStage: "contract",
+      currentStage: "application-receipt",
       payload: {
         clientRef: "banana-123",
         code: "frps-private-beta",
@@ -92,6 +91,7 @@ describe("listTasksRoute", () => {
     });
 
     expect(statusCode).toEqual(200);
+    expect(findCaseByIdUseCase).toHaveBeenCalledWith("xxxxxxxx");
 
     const $ = load(result);
     const view = $("#main-content").html();

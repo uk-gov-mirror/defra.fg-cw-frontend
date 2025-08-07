@@ -1,0 +1,12 @@
+{% extends "layouts/case-layout.njk" %}
+
+{% block content %}
+  {{ heading({ text: pageHeading }) }}
+
+  <div class="govuk-grid-row">
+    <p>{{ message }}</p>
+    {% if(error) %}
+      <pre style="background-color:#EEEEEE;padding:1rem">{{ error.stack }}</pre>
+    {% endif %}
+  </div>
+{% endblock %}

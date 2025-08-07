@@ -1,13 +1,14 @@
 import { getFormattedGBDate } from "../../common/helpers/date-helpers.js";
+import { resolveBannerPaths } from "../../common/helpers/resolvePaths.js";
 
 export const createTaskListViewModel = (caseData) => {
   const stage = caseData.stages.find(
-    (stage) => stage.id === caseData.currentStage,
+    (stageInfo) => stageInfo.id === caseData.currentStage,
   );
 
   return {
-    pageTitle: "Case tasks",
-    heading: "Case",
+    pageTitle: "Case tasks - " + stage.title,
+    pageHeading: "Case",
     breadcrumbs: [
       { text: "Cases", href: "/cases" },
       { text: caseData.caseRef },
@@ -26,6 +27,7 @@ export const createTaskListViewModel = (caseData) => {
         link: `/cases/${caseData._id}`,
         stages: caseData.stages,
         currentStage: caseData.currentStage,
+        banner: resolveBannerPaths(caseData.banner, caseData),
       },
       stage: {
         ...stage,
@@ -35,6 +37,7 @@ export const createTaskListViewModel = (caseData) => {
             ...task,
             link: `/cases/${caseData._id}/tasks/${taskGroup.id}/${task.id}`,
             status: task.status === "complete" ? "COMPLETE" : "INCOMPLETE",
+            isComplete: task.status === "complete",
           })),
         })),
       },

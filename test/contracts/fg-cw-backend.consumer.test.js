@@ -265,11 +265,7 @@ describe('fg-cw-frontend → fg-cw-backend Contract', () => {
           body: stageRequest
         },
         willRespondWith: {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: expectedResponse
+          status: 204
         }
       })
 
@@ -281,11 +277,7 @@ describe('fg-cw-frontend → fg-cw-backend Contract', () => {
         body: JSON.stringify(stageRequest)
       })
 
-      const result = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(result._id).toBe(caseId)
-      expect(result.currentStage).toBe('application-review')
+      expect(response.status).toBe(204)
 
       await provider.verify()
     })

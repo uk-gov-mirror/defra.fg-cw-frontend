@@ -26,7 +26,9 @@ export default [
       "import-x/no-cycle": "error",
       "import-x/no-extraneous-dependencies": [
         "error",
-        { devDependencies: ["src/**/*.test.js"] },
+        {
+          devDependencies: ["src/**/*.test.js"],
+        },
       ],
       "import-x/no-restricted-paths": [
         "error",
@@ -34,7 +36,7 @@ export default [
           zones: [
             {
               target: "**/repositories/**/!(*.test).js",
-              from: ["**/routes/**", "**/subscribers/**", "**/use-cases/**"],
+              from: ["**/routes/**", "**/use-cases/**"],
               message:
                 "Respositories should not import routes, use cases or view models",
             },

@@ -42,13 +42,10 @@ services:
       redis:
         condition: service_started
     env_file:
-      - "compose/aws.env"
+      - ".env"
     environment:
       PORT: 8080
       NODE_ENV: development
-      REDIS_HOST: redis
-      LOCALSTACK_ENDPOINT: http://localstack:4566
-      USE_SINGLE_INSTANCE_CACHE: true
     networks:
       - cdp-tenant
 
